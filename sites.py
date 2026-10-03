@@ -17,7 +17,8 @@ def ru(lang):
 def home(lang, root):
     t = L(lang)
     hero = f'''<div class="hero"><div class="wrap">
-<div><span class="eyebrow">{t("Crisis · PR · Technology", "Антикризис · PR · Технологии")}</span>
+<div><a class="alert-pill" href="#urgent">{icon("zap", 16)}{t("Something happened? Urgent help", "Что-то случилось? Срочная помощь")} {icon("arrow", 16)}</a>
+<span class="eyebrow">{t("Crisis · PR · Technology", "Антикризис · PR · Технологии")}</span>
 <h1>{t("Crisis communications and reputation for technology companies", "Антикризисные коммуникации и репутация для технологических компаний")}</h1>
 <p class="lead">{t("When something goes wrong — an incident, an outage or a wave of bad press — I cover both sides: the technical investigation and how people talk about it. In calmer times I get companies into top-tier media and bring in AI where it makes money.",
 "Когда что-то идёт не так — инцидент, сбой или волна негатива, — я закрываю обе стороны: техническое расследование и то, как об этом говорят. В спокойное время вывожу компании в ведущие СМИ и внедряю ИИ там, где он приносит деньги.")}</p>
@@ -31,6 +32,38 @@ def home(lang, root):
 <div class="stat"><b>5</b><span>{t("years of commercial AI projects", "лет коммерческих проектов с ИИ")}</span></div>
 <div class="stat"><b>3</b><span>{t("books on AI agents, digital safety and communications", "книги об ИИ-агентах, цифровой безопасности и коммуникациях")}</span></div>
 </div></div></section>'''
+
+    now_steps = [
+        t("Don't delete or wipe anything in a hurry. Save screenshots, emails, links and the time things happened.",
+          "Ничего не удаляйте и не стирайте в спешке. Сохраните скриншоты, письма, ссылки и время событий."),
+        t("From another, clean device, change the passwords to your email and key accounts and turn on two-factor authentication.",
+          "С другого, чистого устройства смените пароли от почты и ключевых аккаунтов и включите двухфакторную защиту."),
+        t("Disconnect a suspicious computer or phone from the network, but don't switch it off: it may hold evidence.",
+          "Отключите подозрительный компьютер или телефон от сети, но не выключайте: на нём могут быть следы."),
+        t("Hold off on public statements and replies to journalists until there is a plan.",
+          "Не делайте публичных заявлений и не отвечайте журналистам, пока нет плана."),
+        t("Write to me: briefly what happened, when, and what has already been done.",
+          "Напишите мне: коротко, что случилось, когда и что уже сделано."),
+    ]
+    plan_steps = [
+        (t("First call", "Первый разговор"), t("We put together what happened, what is at risk and what has already been affected.", "Собираем картину: что произошло, что под угрозой и что уже затронуто.")),
+        (t("Containment", "Сдерживание"), t("We close the attacker's access and preserve data for the investigation.", "Закрываем доступы злоумышленнику и сохраняем данные для разбирательства.")),
+        (t("Investigation", "Расследование"), t("Logs, timeline and the point of entry: how it happened and what exactly was taken or changed.", "Журналы, хронология, точка входа: как это произошло и что именно украдено или изменено.")),
+        (t("Communications", "Коммуникации"), t("What to say, to whom and when: clients, partners, employees and the press.", "Что, кому и когда говорить: клиентам, партнёрам, сотрудникам и прессе.")),
+        (t("Recovery and lessons", "Восстановление и выводы"), t("We restore normal work, close the gaps and leave you a written plan for the future.", "Возвращаем нормальную работу, закрываем уязвимости и оставляем письменный план на будущее.")),
+    ]
+    urgent = section(f'''<div class="urgent">
+<div class="urgent-h"><span class="eyebrow">{t("Urgent help", "Срочная помощь")}</span>
+<h2>{t("Something happened? Let's sort it out", "Что-то случилось? Давайте разбираться")}</h2>
+<p>{t("A data leak, a hacked account, a wave of bad press or an outage. Write right away: the first hours decide a lot. Act quickly, but by a plan.",
+      "Утечка, взлом аккаунта, волна негатива или сбой. Напишите сразу: первые часы решают многое. Действовать нужно быстро, но строго по плану.")}</p>
+<div class="btns">{tg_btn(lang, text=t("Write on Telegram now", "Написать в Telegram сейчас"))}{mail_btn(lang, t("Urgent: incident", "Срочно: инцидент"))}</div></div>
+<div class="g2" style="margin-top:36px">
+<div class="card"><h3>{t("What to do right now", "Что сделать прямо сейчас")}</h3>
+<ol class="todo">{"".join(f"<li>{x}</li>" for x in now_steps)}</ol></div>
+<div class="card"><h3>{t("How we will act", "Как мы будем действовать")}</h3>
+<div class="steps">{"".join(f'<div class="step"><b>{i}</b><div><h3 style="font-size:16px;margin-bottom:2px">{h}</h3><p>{p}</p></div></div>' for i, (h, p) in enumerate(plan_steps, 1))}</div></div>
+</div></div>''', 'urgent')
 
     services = section(features([
         ('shield', t("Crisis communications", "Антикризисные коммуникации"),
@@ -146,9 +179,9 @@ def home(lang, root):
 
     prods = section(product_cards(lang, root), 'products', alt=False,
                     head=(t("CakesCats products", "Продукты CakesCats"), NONPROFIT[lang]))
-    body = hero + stats + services + cases + prods + oss + books + exp + vol + eco(lang, 'home', root) + band(
+    body = hero + stats + urgent + services + cases + prods + oss + books + exp + vol + eco(lang, 'home', root) + band(
         lang, t("Let's talk", "Давайте поговорим"), t("A crisis, PR, AI adoption or strategy. I reply personally.", "Кризис, PR, внедрение ИИ или стратегия. Отвечаю лично."))
-    nav = [(t("Services", "Услуги"), '#services'), (t("Cases", "Кейсы"), '#cases'),
+    nav = [(t("Urgent help", "Срочная помощь"), '#urgent'), (t("Services", "Услуги"), '#services'), (t("Cases", "Кейсы"), '#cases'),
            (t("Products", "Продукты"), '#products'), (t("Books", "Книги"), '#books'), (t("Experience", "Опыт"), '#experience')]
     return (t("Cakes Cats — crisis communications, PR and AI consulting", "Cakes Cats — антикризисные коммуникации, PR и ИИ"),
             t("Crisis communications and reputation for technology companies, PR and media support, AI agents and strategy. Author of books on AI agents and digital safety.",

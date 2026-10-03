@@ -216,6 +216,16 @@ a.card:hover{border-color:var(--pink);box-shadow:var(--shadow);transform:transla
 .np .btn{flex:none}
 .free{display:flex;align-items:center;gap:7px;margin-top:8px;font-size:13px;font-weight:500;color:var(--cyan)}
 @media (max-width:720px){.np{flex-direction:column;align-items:flex-start}}
+.alert-pill{display:inline-flex;align-items:center;gap:8px;margin-bottom:22px;padding:7px 14px;border-radius:999px;font-size:14px;font-weight:600;color:var(--cyan);background:rgba(87,243,254,.08);border:1px solid rgba(87,243,254,.35);transition:background .15s}
+.alert-pill:hover{background:rgba(87,243,254,.16)}
+.mainnav>a[href="#urgent"]{color:var(--cyan)}
+.urgent{border:1px solid rgba(87,243,254,.3);border-radius:16px;padding:40px;background:radial-gradient(700px 260px at 0 0,rgba(87,243,254,.08),transparent 70%),var(--card)}
+.urgent-h{max-width:760px}
+.urgent-h p{color:var(--muted);font-size:17px;margin-bottom:24px}
+.todo{margin:14px 0 0;padding-left:24px;list-style:decimal outside;display:grid;gap:10px;color:var(--ink-2);font-size:15px}
+.todo li{display:list-item;padding-left:4px}
+.todo li::marker{color:var(--cyan);font-weight:700}
+@media (max-width:720px){.urgent{padding:24px}}
 .fine{margin-top:22px;font-size:13px;color:var(--muted);text-align:center}
 
 .spec{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;font-size:15px}
@@ -471,7 +481,7 @@ def page(key, lang, paths, title, desc, nav, body, root, noindex=False):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{root}assets/site.css?v=7">
+<link rel="stylesheet" href="{root}assets/site.css?v=9">
 </head>
 <body>
 <header class="hdr"><div class="wrap">
