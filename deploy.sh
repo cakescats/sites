@@ -8,7 +8,7 @@ PORT="${DEPLOY_PORT:-22}"
 KEY="${SSH_KEY:-$HOME/.ssh/id_ed25519}"
 python3 build.py
 DOMAINS=("$@")
-[ ${#DOMAINS[@]} -eq 0 ] && DOMAINS=(cakescats.com main.cakescats.com os.cakescats.com phone.cakescats.com vpn.cakescats.com llm.cakescats.com)
+[ ${#DOMAINS[@]} -eq 0 ] && DOMAINS=(cakescats.com main.cakescats.com os.cakescats.com phone.cakescats.com vpn.cakescats.com llm.cakescats.com sedutil.cakescats.com)
 for dom in "${DOMAINS[@]}"; do
   # основной домен лежит в public_html, поддомены — в одноимённых папках
   if [ "$dom" = cakescats.com ]; then D=public_html; else D="$dom"; fi

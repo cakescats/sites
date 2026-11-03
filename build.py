@@ -15,6 +15,7 @@ PAGES = {
     'phone': [('', 'ru/', sites.phone)],
     'vpn':   [('', 'ru/', sites.vpn)],
     'llm':   [('', 'ru/', sites.llm)],
+    'sedutil': [('', 'ru/', sites.sedutil)],
 }
 
 # редиректы со старых адресов WordPress

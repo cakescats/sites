@@ -160,8 +160,10 @@ def home(lang, root):
 # main.cakescats.com — продуктовая линейка
 # =====================================================================================
 PRICES = {
-    'os': '$990', 'phone': '$1,490', 'vpn': '$990', 'llm': '$9,900',
+    'os': '$990', 'phone': '$1,490', 'vpn': '$990', 'llm': '$9,900', 'sedutil': '$3,000',
 }
+# у PBA нет «готового устройства»: на карточке — корпоративная лицензия
+PRICE_LABEL = {'sedutil': ("Company licence from", "Лицензия для компаний от")}
 
 
 NONPROFIT = {
@@ -174,6 +176,7 @@ PRODUCTS = [
     ('vpn', 'router', ("A plug-and-play router with a dedicated V2Ray server and a separate private Wi-Fi network.", "Роутер «включил и работает» с выделенным сервером V2Ray и отдельной приватной Wi-Fi-сетью.")),
     ('os', 'mac-hero', ("An isolated virtual workspace for Macs with Apple silicon, with encrypted storage and Tor routing.", "Изолированная виртуальная среда для Mac на Apple silicon с шифрованным хранилищем и маршрутизацией через Tor.")),
     ('llm', 'llm-card', ("A private AI appliance: chat, documents and automation on your premises, with no cloud.", "Приватный ИИ-сервер: чат, документы и автоматизация у вас, без облака.")),
+    ('sedutil', 'pba-card', ("Hardware encryption for OPAL 2.0 SSDs with a password screen before boot. Customised for companies, with SSO and MDM.", "Аппаратное шифрование SSD с OPAL 2.0 и вводом пароля до загрузки. Для компаний — своя сборка, SSO и MDM.")),
 ]
 
 
@@ -184,7 +187,7 @@ def product_cards(lang, root, exclude=None):
         if k == exclude:
             continue
         cards.append(f'<a class="card prod" href="{url(k)}{ru(lang)}"><div class="pi"><img src="{root}assets/img/{img}.webp" alt="" loading="lazy"></div>'
-                     f'<div class="pb"><h3>{ECO[k][0][lang]}</h3><p>{t(den, dru)}</p><div class="from">{t("Ready-made from", "Готовое решение от")} <b>{PRICES[k]}</b></div>'
+                     f'<div class="pb"><h3>{ECO[k][0][lang]}</h3><p>{t(den, dru)}</p><div class="from">{t(*PRICE_LABEL.get(k, ("Ready-made from", "Готовое решение от")))} <b>{PRICES[k]}</b></div>'
                      f'<div class="free">{icon("heart", 16)}{t("Free to download or build from the guide", "Бесплатно: скачать или собрать по инструкции")}</div>'
                      f'<span class="link" style="margin-top:12px">{t("Learn more", "Подробнее")} {icon("arrow", 16)}</span></div></a>')
     return f'<div class="g{len(cards)}">{"".join(cards)}</div>'
@@ -201,8 +204,8 @@ def main(lang, root):
     hero = f'''<div class="hero"><div class="wrap">
 <div><span class="eyebrow">{t("Privacy · Local AI · Open source", "Приватность · Локальный ИИ · Open source")}</span>
 <h1>{t("Privacy devices and private AI", "Устройства для приватности и локальный ИИ")}</h1>
-<p class="lead">{t("CakesCats builds ready-to-use devices for private work: a protected phone, a private network, an isolated workspace for Mac and AI that runs on your premises. Everything is built on open source — you can assemble it yourself for free, or get it set up and supported by us.",
-"CakesCats делает готовые устройства для приватной работы: защищённый телефон, приватную сеть, изолированную среду для Mac и ИИ, который работает у вас. Всё построено на открытом коде — можно собрать самому бесплатно или получить готовое решение с настройкой и поддержкой.")}</p>
+<p class="lead">{t("CakesCats builds ready-to-use devices for private work: a protected phone, a private network, an isolated workspace for Mac, AI that runs on your premises and free hardware disk encryption. Everything is built on open source — you can assemble it yourself for free, or get it set up and supported by us.",
+"CakesCats делает готовые устройства для приватной работы: защищённый телефон, приватную сеть, изолированную среду для Mac, ИИ, который работает у вас, и бесплатное аппаратное шифрование дисков. Всё построено на открытом коде — можно собрать самому бесплатно или получить готовое решение с настройкой и поддержкой.")}</p>
 <div class="btns">{btn("#products", t("Explore products", "Смотреть продукты"))}{tg_btn(lang, "s", t("Talk to us", "Связаться"))}</div>
 <div class="trust"><span>{icon("code", 18)}{t("Open source", "Открытый код")}</span><span>{icon("tool", 18)}{t("Set up for you", "Настройка за вас")}</span><span>{icon("users", 18)}{t("Personal support", "Личная поддержка")}</span></div></div>
 <div class="media"><img src="{root}assets/img/brand-banner.webp" alt="" width="1375" height="681"></div>
@@ -305,26 +308,30 @@ def insights(lang, root):
 # =====================================================================================
 # Продуктовые сайты
 # =====================================================================================
+PBA_REPO = f'{GITHUB}/sedutil-pba'
 GUIDE_DIRS = {'os': 'virtualcatsos', 'phone': 'phone', 'vpn': 'vpn-router', 'llm': 'llm-edgebox'}
 
 
 def guide_url(lang, key):
+    if key == 'sedutil':  # инструкция живёт в репозитории самого проекта
+        return f'{PBA_REPO}/blob/main/docs/manual{".ru" if lang == "ru" else ""}.md'
     return f'{GITHUB}/guides/blob/main/{GUIDE_DIRS[key]}/README{".ru" if lang == "ru" else ""}.md'
 
 
-def product_page(lang, root, key, *, eyebrow, h1, lead, hero_img, hero_contain, trust, overview, feats, how, tiers_items, spec_rows, faqs, subject, cta_title, cta_sub, nav_extra=()):
+def product_page(lang, root, key, *, eyebrow, h1, lead, hero_img, hero_contain, trust, overview, feats, how, tiers_items, spec_rows, faqs, subject, cta_title, cta_sub, nav_extra=(),
+                 hero_btns=None, pricing_head=None, tiers_note=None, tiers_fine=None):
     t = L(lang)
     hero = f'''<div class="hero"><div class="wrap">
 <div><span class="eyebrow">{eyebrow}</span><h1>{h1}</h1><p class="lead">{lead}</p>
-<div class="btns">{btn("#pricing", t("See configurations &amp; prices", "Конфигурации и цены"))}{tg_btn(lang, "s", t("Ask a question", "Задать вопрос"))}</div>
+<div class="btns">{hero_btns or btn("#pricing", t("See configurations &amp; prices", "Конфигурации и цены")) + tg_btn(lang, "s", t("Ask a question", "Задать вопрос"))}</div>
 <div class="trust">{"".join(f"<span>{icon(i, 18)}{x}</span>" for i, x in trust)}</div></div>
 <div class="media{" contain" if hero_contain else ""}"><img src="{root}assets/img/{hero_img}.webp" alt=""></div>
 </div></div>'''
     ov = section(features(overview, cols=3), 'overview', head=(t("Overview", "Обзор"), None))
     ft = section(features(feats, cols=3), 'features', alt=True, head=(t("Features", "Возможности"), None))
     hw = section(how, 'how') if how else ''
-    pr = section(tiers(lang, tiers_items, subject, guide_url(lang, key)), 'pricing', alt=True,
-                 head=(t("Free, or ready-made", "Бесплатно или готовым решением"), t("Build it yourself from the guide, or support the project with a ready-made device or individual support.", "Соберите сами по инструкции или поддержите проект: купите готовое устройство или индивидуальную поддержку.")), center=True)
+    pr = section(tiers(lang, tiers_items, subject, guide_url(lang, key), tiers_note, tiers_fine), 'pricing', alt=True,
+                 head=pricing_head or (t("Free, or ready-made", "Бесплатно или готовым решением"), t("Build it yourself from the guide, or support the project with a ready-made device or individual support.", "Соберите сами по инструкции или поддержите проект: купите готовое устройство или индивидуальную поддержку.")), center=True)
     sp = section(spec(spec_rows), 'specs', head=(t("Technical specifications", "Технические характеристики"), None))
     fq = section(faq(faqs), 'faq', alt=True, head=(t("Frequently asked questions", "Частые вопросы"), None), center=True)
     body = hero + ov + ft + hw + pr + sp + fq + other_products(lang, root, key) + eco(lang, key, root) + band(lang, cta_title, cta_sub, subject)
@@ -611,10 +618,222 @@ def llm(lang, root):
         cta_sub=t("Book a demo — we'll show EdgeBox on your kind of documents.", "Запишитесь на демонстрацию — покажем EdgeBox на ваших типовых документах."),
         nav_extra=[(t("Who it's for", "Для кого"), '#who')])
     # блок «для кого» после возможностей
-    body = body.replace('<section id="pricing"', how + '<section id="pricing"', 1)
+    body = body.replace("<section id='pricing'", how + "<section id='pricing'", 1)
     return (t("LLM EdgeBox — private AI on your premises", "LLM EdgeBox — приватный ИИ у вас в офисе"),
             t("A ready-to-use, fully offline AI appliance: chat, document search and automation with your data staying in-house. From $9,900.",
               "Готовый ИИ-сервер, работающий полностью офлайн: чат, поиск по документам и автоматизация — данные остаются внутри компании. От $9,900."),
+            nav, body)
+
+
+def sedutil(lang, root):
+    t = L(lang)
+    from urllib.parse import quote
+    quote_mail = f'mailto:{MAIL}?subject={quote("CakesCats PBA licence")}'
+
+    # сравнение с коммерческими продуктами и BitLocker
+    rows = [
+        (t("Price", "Цена"),
+         t("Free, GPL-3.0. Customisation for companies: a flat licence from $3,000", "Бесплатно, GPL-3.0. Настройка для компаний — фиксированная лицензия от $3,000"),
+         t("Per-seat licence or subscription, price on request", "Лицензия или подписка за каждое место, цена по запросу"),
+         t("Included in Windows Pro and Enterprise; Intune or ConfigMgr licensed separately", "Входит в Windows Pro и Enterprise; Intune или ConfigMgr — отдельные лицензии")),
+        (t("Drive's hardware encryption", "Аппаратное шифрование диска"),
+         t("Always: the SSD encrypts, the CPU does nothing", "Всегда: шифрует сам SSD, процессор не нагружается"),
+         t("Yes, in OPAL mode", "Да, в режиме OPAL"),
+         t("Software by default since 2019 (KB4516071); eDrive must be enabled by policy", "С 2019 года по умолчанию программное (KB4516071); eDrive включается политикой")),
+        (t("Source code", "Исходный код"),
+         t("Open, reproducible builds with published hashes", "Открыт, воспроизводимые сборки с опубликованными хэшами"),
+         t("Closed", "Закрыт"), t("Closed", "Закрыт")),
+        (t("Operating systems", "Операционные системы"),
+         t("Any OS after unlock: Windows, Linux, dual boot", "Любая ОС после разблокировки: Windows, Linux, несколько систем"),
+         t("Depends on the product and its agent", "Зависит от продукта и его агента"),
+         t("Windows only", "Только Windows")),
+        (t("Pre-boot screen", "Экран до загрузки"),
+         t("Fully yours: logo, colours, texts, helpdesk line", "Полностью ваш: логотип, цвета, тексты, телефон поддержки"),
+         t("Within what the vendor allows", "В рамках того, что разрешает вендор"),
+         t("Recovery message and URL", "Сообщение и ссылка для восстановления")),
+        (t("SSO and MDM", "SSO и MDM"),
+         t("Entra ID, Okta, Keycloak; Intune, ConfigMgr, Workspace ONE — integrated for your deployment", "Entra ID, Okta, Keycloak; Intune, ConfigMgr, Workspace ONE — интеграция под ваш парк"),
+         t("Through the vendor's management server", "Через сервер управления вендора"),
+         t("Key escrow in Entra ID, policies in Intune", "Ключи в Entra ID, политики в Intune")),
+        (t("Lock-in", "Привязка"),
+         t("None: the open core keeps working without us", "Нет: открытое ядро работает и без нас"),
+         t("Vendor's server and renewals", "Сервер вендора и продления"),
+         t("Microsoft stack", "Экосистема Microsoft")),
+    ]
+    head = (f'<thead><tr><th></th><th class="us">CakesCats PBA</th><th>{t("Commercial suites", "Коммерческие продукты")}¹</th>'
+            f'<th>BitLocker + Intune</th></tr></thead>')
+    body_rows = ''.join(f'<tr><th>{k}</th><td class="us">{a}</td><td>{b}</td><td>{c}</td></tr>' for k, a, b, c in rows)
+    cmp_note = t("¹ Trellix (McAfee) Complete Data Protection, WinMagic SecureDoc, Check Point Full Disk Encryption. Dell Encryption Enterprise has been end of sale since 2022. "
+                 "We compare published capabilities; check the details with each vendor.",
+                 "¹ Trellix (McAfee) Complete Data Protection, WinMagic SecureDoc, Check Point Full Disk Encryption. Dell Encryption Enterprise снят с продажи в 2022 году. "
+                 "Сравниваем опубликованные возможности; детали уточняйте у вендоров.")
+    compare = section(f'<div class="spec-wrap"><table class="cmp">{head}<tbody>{body_rows}</tbody></table></div><p class="fine" style="text-align:left">{cmp_note}</p>',
+                      'compare', head=(t("The same thing others sell per seat — free", "То же, что другие продают за каждое место, — бесплатно"),
+                                       t("Corporate disk-encryption suites use the same OPAL hardware encryption that is built into your SSD. "
+                                         "CakesCats PBA unlocks it with open code, at no cost.",
+                                         "Корпоративные продукты для шифрования дисков используют то же аппаратное шифрование OPAL, что уже встроено в ваш SSD. "
+                                         "CakesCats PBA включает его открытым кодом и бесплатно.")))
+
+    # для компаний: кастомизация, SSO, MDM
+    ent_feats = features([
+        ('sliders', t("Your build, your screen", "Своя сборка и свой экран"),
+         t("Logo, background, colours, texts, a helpdesk line and a legal banner. Any setting can be fixed or hidden; extra features can be switched off.",
+           "Логотип, фон, цвета, тексты, телефон поддержки и юридический баннер. Любую настройку можно зафиксировать или скрыть, лишние функции — выключить.")),
+        ('qr', t("SSO unlock", "Разблокировка через SSO"),
+         t("The PBA shows a QR code, the employee signs in on their phone with Entra ID, Okta, Keycloak or Google Workspace, and your unlock server returns the drive key.",
+           "PBA показывает QR-код, сотрудник входит с телефона через Entra ID, Okta, Keycloak или Google Workspace, а ваш сервер разблокировки возвращает ключ диска.")),
+        ('layers', t("MDM rollout", "Развёртывание через MDM"),
+         t("Enrolment, policies and recovery keys through Intune, ConfigMgr, Workspace ONE or Ivanti; Ansible or Salt for Linux fleets.",
+           "Подключение машин, политики и ключи восстановления через Intune, ConfigMgr, Workspace ONE или Ivanti; для Linux — Ansible или Salt.")),
+        ('wifi', t("Network unlock", "Разблокировка в сети"),
+         t("On a trusted office network, machines unlock without user input, like BitLocker Network Unlock. Off the network, the password or SSO applies.",
+           "В доверенной офисной сети машины разблокируются без участия пользователя, как BitLocker Network Unlock. Вне сети — пароль или SSO.")),
+        ('key', t("Recovery and audit", "Восстановление и аудит"),
+         t("Recovery passwords in your vault, a log of every unlock, emergency erase, PIN, USB keys and TPM — as your policy requires.",
+           "Пароли восстановления в вашем хранилище, журнал каждой разблокировки, экстренное стирание, PIN, USB-ключи и TPM — как требует ваша политика.")),
+        ('server', t("Self-hosted, no cloud of ours", "У вас, без нашего облака"),
+         t("The unlock server runs on your infrastructure. We never see keys or passwords. Secure Boot signing with your own keys.",
+           "Сервер разблокировки работает в вашей инфраструктуре. Ключи и пароли мы не видим. Подпись для Secure Boot вашими ключами.")),
+    ], cols=3)
+    ent_steps = f'''<div class="split" style="margin-top:56px"><div>
+<h2>{t("How it goes", "Как проходит внедрение")}</h2>
+<div class="steps">
+<div class="step"><b>1</b><div><h3>{t("Requirements", "Требования")}</h3><p>{t("A call about your fleet, drives, IdP, MDM and policies.", "Созвон о вашем парке, дисках, IdP, MDM и политиках.")}</p></div></div>
+<div class="step"><b>2</b><div><h3>{t("Pilot", "Пилот")}</h3><p>{t("We build your image and test it on your laptop and desktop models.", "Собираем ваш образ и проверяем на ваших моделях ноутбуков и ПК.")}</p></div></div>
+<div class="step"><b>3</b><div><h3>{t("Rollout", "Развёртывание")}</h3><p>{t("Deployment through your MDM, with a recovery plan and helpdesk instructions.", "Развёртывание через ваш MDM, с планом восстановления и инструкцией для поддержки.")}</p></div></div>
+<div class="step"><b>4</b><div><h3>{t("Updates and support", "Обновления и поддержка")}</h3><p>{t("New kernels and hardware, security fixes and help for your IT team.", "Новые ядра и железо, исправления безопасности и помощь вашим ИТ.")}</p></div></div>
+</div></div>
+<div class="card"><span class="tag">{t("Built on the open core", "На открытом ядре")}</span><h3>{t("You can always check what you run", "Вы всегда можете проверить, что работает у вас")}</h3>
+<p>{t("Corporate builds are made from the same public code as the free image, plus your settings and the integrations you need. They are developed for your deployment, and the scope and timeline go into the contract.",
+       "Корпоративные сборки делаются из того же открытого кода, что и бесплатный образ, плюс ваши настройки и нужные интеграции. Они разрабатываются под ваше внедрение, объём и сроки фиксируются в договоре.")}</p>
+<ul>{"".join(f"<li>{icon('check', 18)}<span>{x}</span></li>" for x in [t("Source code of your build", "Исходный код вашей сборки"), t("Reproducible images with hashes", "Воспроизводимые образы с хэшами"), t("No telemetry", "Без телеметрии")])}</ul></div>
+</div>'''
+    enterprise = section(ent_feats + ent_steps, 'business', alt=True,
+                         head=(t("For companies: as flexible as you need", "Для компаний: настройка под любые требования"),
+                               t("Your branding, your sign-in, your MDM. One flat licence for the whole fleet instead of paying per seat every year.",
+                                 "Ваш бренд, ваш вход, ваш MDM. Одна фиксированная лицензия на весь парк вместо ежегодной оплаты за каждое место.")))
+
+    gh = btn(PBA_REPO, t("Download free on GitHub", "Скачать бесплатно на GitHub"), 'p', 'code', ext=True)
+    biz = btn('#business', t("For companies", "Для компаний"), 's', 'briefcase')
+    body, nav = product_page(
+        lang, root, 'sedutil',
+        eyebrow="sedutil · TCG OPAL 2.0",
+        h1=t("Hardware disk encryption. Free.", "Аппаратное шифрование дисков. Бесплатно."),
+        lead=t("CakesCats PBA is a maintained fork of sedutil for self-encrypting SSDs. It asks for the password before the OS starts, unlocks the drive and boots on. "
+               "Corporate suites sell exactly this per seat; here it is open source and free. For companies, we customise it, with SSO and MDM.",
+               "CakesCats PBA — поддерживаемый форк sedutil для самошифрующихся SSD. Он спрашивает пароль до запуска ОС, разблокирует диск и загружает систему. "
+               "Корпоративные продукты продают ровно это за каждое место; здесь — открытый код и бесплатно. Для компаний настраиваем под вас, с SSO и MDM."),
+        hero_img='pba-hero', hero_contain=False,
+        hero_btns=gh + biz,
+        trust=[('code', t("Open source, GPL-3.0", "Открытый код, GPL-3.0")), ('drive', 'SATA · NVMe'), ('zap', t("No CPU load", "Без нагрузки на процессор"))],
+        overview=[
+            ('lock', t("Locked before the OS", "Закрыт до запуска ОС"),
+             t("Without the password the drive gives nothing, even when it is taken out of the laptop. The PBA starts from the drive's shadow MBR.",
+               "Без пароля диск ничего не отдаёт, даже если его вынуть из ноутбука. PBA загружается из теневого MBR самого диска.")),
+            ('zap', t("Encryption costs nothing", "Шифрование ничего не стоит"),
+             t("OPAL drives always encrypt in hardware. The PBA only manages the key, so there is no slowdown and the key never leaves the drive.",
+               "Диски OPAL всегда шифруют аппаратно. PBA только управляет ключом: нет замедления, а ключ не покидает диск.")),
+            ('check', t("Works with what you have", "Работает с тем, что уже есть"),
+             t("Drives set up with sedutil 1.x keep working: the default hashing is the same, so no passwords have to be set again.",
+               "Диски, настроенные sedutil 1.x, продолжают работать: хэширование по умолчанию то же, пароли менять не нужно.")),
+        ],
+        feats=[
+            ('drive', t("Several drives", "Несколько дисков"),
+             t("Each password is tried on every locked drive; then you can type another password for the rest.", "Каждый пароль пробуется на всех заблокированных дисках; затем можно ввести другой пароль для остальных.")),
+            ('layers', t("Partitions with their own password", "Разделы со своим паролем"),
+             t("Lock separate partitions with separate passwords, typed one after the other.", "Отдельные разделы закрываются отдельными паролями и вводятся один за другим.")),
+            ('key', 'SHA-512',
+             t("PBKDF2-SHA512 with configurable iterations, besides the sedutil-compatible SHA-1.", "PBKDF2-SHA512 с настраиваемым числом итераций, помимо совместимого с sedutil SHA-1.")),
+            ('shield', t("Hardened image", "Защищённый образ"),
+             t("No service shell, no kernel modules, no network drivers and a locked boot menu.", "Без сервисной консоли, модулей ядра и сетевых драйверов, с закрытым меню загрузки.")),
+            ('cpu', t("Current hardware", "Современное железо"),
+             t("Linux 6.18 LTS instead of 4.11, and a boot-menu fix for CPUs where the old PBA hangs (sedutil#404).", "Linux 6.18 LTS вместо 4.11 и пункт меню для процессоров, на которых старый PBA зависает (sedutil#404).")),
+            ('code', t("Reproducible builds", "Воспроизводимые сборки"),
+             t("Built in GitHub Actions with published hashes: you can rebuild the image and get the same file.", "Собирается в GitHub Actions с опубликованными хэшами: образ можно пересобрать и получить тот же файл.")),
+        ],
+        how=None,
+        pricing_head=(t("Free, or customised for your company", "Бесплатно или под вашу компанию"),
+                      t("The open image is free for everyone. Companies buy a licence for customisation, integrations and support — one price for the whole fleet.",
+                        "Открытый образ бесплатен для всех. Компании покупают лицензию на настройку, интеграции и поддержку — одна цена на весь парк.")),
+        tiers_note=t("<b>The image is free.</b> CakesCats PBA is open source under GPL-3.0: download it, check it, build it yourself. "
+                     "A company licence pays for customisation, integrations and support, and funds the open project.",
+                     "<b>Образ бесплатен.</b> CakesCats PBA — открытый код под GPL-3.0: скачайте, проверьте, соберите сами. "
+                     "Лицензия для компаний оплачивает настройку, интеграции и поддержку и поддерживает открытый проект."),
+        tiers_fine=t(f'Prices in USD, excluding taxes. The licence covers the number of machines in your fleet. Questions: <a class="link" href="{quote_mail}">{MAIL}</a>',
+                     f'Цены в долларах США, без налогов. Лицензия считается по числу машин в парке. Вопросы: <a class="link" href="{quote_mail}">{MAIL}</a>'),
+        tiers_items=[
+            {'name': t("Open source", "Открытый код"), 'free': True,
+             'desc': t("The full PBA image and sedutil-cli for anyone, at home or at work.", "Полный образ PBA и sedutil-cli для всех — дома и на работе."),
+             'price': '$0', 'note': t("GPL-3.0, forever", "GPL-3.0, навсегда"),
+             'list': [t("Default and hardened images", "Обычный и защищённый образы"), t("Several drives and partitions", "Несколько дисков и разделов"),
+                      t("User manual in English and Russian", "Руководство на английском и русском"), t("Community support on GitHub", "Поддержка сообщества на GitHub")]},
+            {'name': 'Business', 'badge': t("Up to 100 machines", "До 100 машин"),
+             'desc': t("Customisation for a company or a team.", "Настройка для компании или команды."),
+             'price': '$3,000', 'note': t("Licence for up to 100 machines", "Лицензия до 100 машин"),
+             'list': [t("Your skin: logo, colours, texts, helpdesk line", "Ваш экран: логотип, цвета, тексты, телефон поддержки"),
+                      t("Settings and features to your policy", "Настройки и функции под вашу политику"),
+                      t("SSO unlock: Entra ID, Okta, Keycloak", "Разблокировка через SSO: Entra ID, Okta, Keycloak"),
+                      t("MDM rollout: Intune, ConfigMgr, Workspace ONE", "Развёртывание через MDM: Intune, ConfigMgr, Workspace ONE"),
+                      t("Secure Boot signing with your keys", "Подпись Secure Boot вашими ключами"),
+                      t("12 months of updates and support", "12 месяцев обновлений и поддержки")],
+             'cta': t("Buy a licence", "Купить лицензию")},
+            {'name': 'Enterprise',
+             'desc': t("For a larger fleet with several hardware models.", "Для большого парка с разными моделями железа."),
+             'price': '$25,000', 'note': t("Licence for 101 to 1,000 machines", "Лицензия от 101 до 1 000 машин"),
+             'list': [t("Everything in Business", "Всё из Business"),
+                      t("Pilot on your laptop and desktop models", "Пилот на ваших моделях ноутбуков и ПК"),
+                      t("Network unlock in the office", "Разблокировка в офисной сети"),
+                      t("Unlock audit log and recovery in your vault", "Журнал разблокировок и восстановление через ваше хранилище"),
+                      t("Priority support", "Приоритетная поддержка")],
+             'href': quote_mail, 'cta': t("Request a quote", "Запросить расчёт")},
+            {'name': t("Over 1,000 machines", "Больше 1 000 машин"),
+             'desc': t("Large organisations and custom requirements.", "Крупные организации и особые требования."),
+             'price': t("Custom", "Индивидуально"), 'note': t("Priced per project", "Цена под проект"),
+             'list': [t("Everything in Enterprise", "Всё из Enterprise"),
+                      t("Highly available unlock servers", "Отказоустойчивые серверы разблокировки"),
+                      t("Features developed to your requirements", "Функции под ваши требования"),
+                      t("SLA and on-site help", "SLA и помощь на месте")],
+             'href': quote_mail, 'cta': t("Contact us", "Связаться")},
+        ],
+        spec_rows=[
+            (t("Standard", "Стандарт"), t("TCG OPAL 2.0 self-encrypting drives, SATA and NVMe", "Самошифрующиеся диски TCG OPAL 2.0, SATA и NVMe")),
+            (t("Firmware", "Прошивка"), t("UEFI, x86_64; boots any OS after unlock", "UEFI, x86_64; после разблокировки загружается любая ОС")),
+            (t("Base", "Основа"), t("Buildroot 2026.02 LTS, Linux 6.18 LTS", "Buildroot 2026.02 LTS, Linux 6.18 LTS")),
+            (t("Image", "Образ"), t("32 MiB; default and hardened profiles", "32 МиБ; профили default и hardened")),
+            (t("Password hashing", "Хэширование пароля"), t("PBKDF2-SHA1, 75,000 iterations (as in sedutil 1.x) or PBKDF2-SHA512", "PBKDF2-SHA1, 75 000 итераций (как в sedutil 1.x) или PBKDF2-SHA512")),
+            (t("Tools", "Утилиты"), t("sedutil-cli, static build for Linux", "sedutil-cli, статическая сборка для Linux")),
+            (t("Tested on", "Проверено на"), t("KIOXIA XG8 NVMe, in a VM and on bare metal; more drives in testing", "KIOXIA XG8 NVMe, в виртуальной машине и на железе; другие диски — в работе")),
+            (t("Licence", "Лицензия"), t("GPL-3.0-or-later, like sedutil", "GPL-3.0-or-later, как у sedutil")),
+        ],
+        faqs=[
+            (t("Is it really free?", "Это правда бесплатно?"),
+             t("Yes. The image and the code are under GPL-3.0, for personal and business use. Companies pay only when they want their own build, integrations or support.",
+               "Да. Образ и код — под GPL-3.0, для личного и коммерческого использования. Компании платят, только если нужна своя сборка, интеграции или поддержка.")),
+            (t("Will it work with my drive?", "Подойдёт ли мой диск?"),
+             t(f"With most SSDs that support TCG OPAL 2.0. Check with <code>sedutil-cli --scan</code> and test the image from a USB stick first, as the <a class=\"link\" href=\"{guide_url(lang, 'sedutil')}\" target=\"_blank\" rel=\"noopener\">manual</a> describes.",
+               f"С большинством SSD, которые поддерживают TCG OPAL 2.0. Проверьте командой <code>sedutil-cli --scan</code> и сначала запустите образ с флешки, как описано в <a class=\"link\" href=\"{guide_url(lang, 'sedutil')}\" target=\"_blank\" rel=\"noopener\">руководстве</a>.")),
+            (t("What if the password is lost?", "Что, если пароль потерян?"),
+             t("Without the password the data can't be read; that is the point. The drive can be reset with the PSID printed on its label, which erases it. Company builds add recovery passwords kept in your vault.",
+               "Без пароля данные не прочитать — в этом и смысл. Диск можно сбросить кодом PSID с его наклейки, но данные при этом стираются. В корпоративных сборках есть пароли восстановления в вашем хранилище.")),
+            (t("How is it different from BitLocker?", "Чем это отличается от BitLocker?"),
+             t("Since 2019 BitLocker encrypts in software by default, even on self-encrypting drives. CakesCats PBA uses the drive's own encryption, works with any OS and can run alongside BitLocker.",
+               "С 2019 года BitLocker по умолчанию шифрует программно, даже на самошифрующихся дисках. CakesCats PBA использует шифрование самого диска, работает с любой ОС и может работать вместе с BitLocker.")),
+            (t("What about sleep and hibernation?", "Как со сном и гибернацией?"),
+             t("Hibernate works: the machine boots through the PBA and the OS resumes. With S3 sleep, a drive that loses power locks again; test it on your machines. Company builds can include helpers for resume.",
+               "Гибернация работает: машина загружается через PBA, и ОС восстанавливается. При сне S3 диск, потерявший питание, снова блокируется — проверьте на своих машинах. В корпоративные сборки можно добавить помощники для выхода из сна.")),
+            (t("Do you get our keys or passwords?", "Вы получаете наши ключи или пароли?"),
+             t("No. The free image has no network at all. In company builds the unlock server runs on your infrastructure, and the source code of your build is yours.",
+               "Нет. В бесплатном образе сети нет вообще. В корпоративных сборках сервер разблокировки работает у вас, а исходный код вашей сборки остаётся у вас.")),
+        ],
+        subject='CakesCats PBA',
+        cta_title=t("Encrypt your company's fleet without paying per seat", "Зашифруйте парк компании без оплаты за каждое место"),
+        cta_sub=t("Tell us about your fleet, IdP and MDM, and we'll propose a pilot.", "Расскажите о парке, IdP и MDM — предложим пилот."),
+        nav_extra=[(t("Compare", "Сравнение"), '#compare'), (t("For companies", "Для компаний"), '#business')])
+    body = body.replace("<section id='pricing'", compare + enterprise + "<section id='pricing'", 1)
+    nav = [n for n in nav if n[1] not in ('#overview', '#specs')]  # в шапке не помещаются все пункты
+    return (t("CakesCats PBA — free sedutil hardware disk encryption for OPAL 2.0 SSDs", "CakesCats PBA — бесплатное аппаратное шифрование дисков OPAL 2.0 на sedutil"),
+            t("A maintained sedutil fork: pre-boot authorization for TCG OPAL 2.0 self-encrypting SSDs. Free and open source; for companies — custom builds with SSO and MDM from $3,000.",
+              "Поддерживаемый форк sedutil: ввод пароля до загрузки для самошифрующихся SSD TCG OPAL 2.0. Бесплатно и с открытым кодом; для компаний — свои сборки с SSO и MDM от $3,000."),
             nav, body)
 
 

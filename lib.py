@@ -11,8 +11,9 @@ SITES = {
     'phone': {'domain': 'phone.cakescats.com', 'name': 'CakesCats Phone','sub': {'en': 'GrapheneOS', 'ru': 'GrapheneOS'}},
     'vpn':   {'domain': 'vpn.cakescats.com',   'name': 'VPN Router',     'sub': {'en': 'by CakesCats', 'ru': 'от CakesCats'}},
     'llm':   {'domain': 'llm.cakescats.com',   'name': 'LLM EdgeBox',    'sub': {'en': 'Private AI', 'ru': 'Приватный ИИ'}},
+    'sedutil': {'domain': 'sedutil.cakescats.com', 'name': 'CakesCats PBA', 'sub': {'en': 'sedutil', 'ru': 'sedutil'}},
 }
-ORDER = ['home', 'main', 'os', 'phone', 'vpn', 'llm']
+ORDER = ['home', 'main', 'os', 'phone', 'vpn', 'llm', 'sedutil']
 
 ECO = {
     'home':  ({'en': 'Consulting', 'ru': 'Консалтинг'},
@@ -33,6 +34,9 @@ ECO = {
     'llm':   ({'en': 'LLM EdgeBox', 'ru': 'LLM EdgeBox'},
               {'en': 'Private AI that runs on your premises, with no cloud.',
                'ru': 'Приватный ИИ, который работает у вас, без облака.'}),
+    'sedutil': ({'en': 'CakesCats PBA', 'ru': 'CakesCats PBA'},
+                {'en': 'Free hardware disk encryption for OPAL 2.0 SSDs, with SSO and MDM for companies.',
+                 'ru': 'Бесплатное аппаратное шифрование SSD с OPAL 2.0, для компаний — SSO и MDM.'}),
 }
 
 TG = 'https://t.me/cakescats'
@@ -79,6 +83,8 @@ _IC = {
     'box': '<path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/>',
     'tool': '<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19l-3 1 1-3 7.5-7.5"/><path d="M14.5 6.5L17 4l3 3-2.5 2.5"/>',
     'menu': '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    'drive': '<rect x="3" y="13" width="18" height="7" rx="1.5"/><path d="M5 13l2.5-8h9L19 13"/><path d="M7 16.5h.01M11 16.5h6"/>',
+    'qr': '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M17 21h4v-4M14 18v3"/>',
 }
 
 
@@ -170,6 +176,7 @@ h3{font-size:19px;line-height:1.3;font-weight:600;letter-spacing:-.01em;margin-b
 .g2{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:20px}
 .feat .ic{width:46px;height:46px;border-radius:12px;background:var(--brand-soft);color:var(--pink);display:grid;place-items:center;margin-bottom:16px}
 .feat p{color:var(--muted);font-size:15px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:28px;transition:box-shadow .2s,border-color .2s,transform .2s}
@@ -204,7 +211,7 @@ a.card:hover{border-color:var(--pink);box-shadow:var(--shadow);transform:transla
 .price{margin:18px 0 4px;font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1.1;color:#fff}
 .price small{font-size:15px;font-weight:500;color:var(--muted);letter-spacing:0}
 .pnote{font-size:13px;color:var(--muted);min-height:20px}
-.tier ul{list-style:none;margin:18px 0 24px;display:grid;gap:9px;flex:1}
+.tier ul{list-style:none;margin:18px 0 24px;display:grid;gap:9px;flex:1;align-content:start}
 .tier li{display:flex;gap:10px;font-size:15px;color:var(--ink-2)}
 .tier li .i{color:var(--cyan);margin-top:3px}
 .tier .btns{flex-direction:column}
@@ -224,6 +231,14 @@ a.card:hover{border-color:var(--pink);box-shadow:var(--shadow);transform:transla
 .spec td{color:var(--ink-2)}
 .spec tr:last-child th,.spec tr:last-child td{border-bottom:0}
 .spec-wrap{overflow-x:auto}
+.cmp{width:100%;min-width:760px;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;font-size:15px}
+.cmp th,.cmp td{text-align:left;padding:14px 18px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmp thead th{background:var(--card-2);color:#fff;font-weight:600}
+.cmp thead th.us{color:var(--cyan)}
+.cmp tbody th{width:20%;font-weight:600;color:#fff}
+.cmp td{color:var(--muted)}
+.cmp td.us{color:var(--ink);background:rgba(87,243,254,.05)}
+.cmp tr:last-child>*{border-bottom:0}
 
 .split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
 .split .media{min-height:360px}
@@ -297,6 +312,7 @@ footer .bot{border-top:1px solid var(--line);padding-top:22px;padding-bottom:28p
   .hero .wrap,.split{grid-template-columns:1fr;gap:40px}
   .g4{grid-template-columns:repeat(2,1fr)}
   .g3,.cfg,.cfg.n4,.eco{grid-template-columns:1fr 1fr}
+  .g5{grid-template-columns:repeat(3,1fr)}
   footer .top{grid-template-columns:1fr 1fr}
 }
 @media (max-width:720px){
@@ -305,7 +321,7 @@ footer .bot{border-top:1px solid var(--line);padding-top:22px;padding-bottom:28p
   .logo small{display:none}
   section{padding:56px 0}
   .hero .wrap{padding-top:44px;padding-bottom:44px}
-  .g2,.g3,.g4,.cfg,.cfg.n4,.eco{grid-template-columns:1fr}
+  .g2,.g3,.g4,.g5,.cfg,.cfg.n4,.eco{grid-template-columns:1fr}
   .stats{grid-template-columns:1fr}
   .stat{border-right:0;border-bottom:1px solid var(--line)}
   .stat:last-child{border-bottom:0}
@@ -374,7 +390,7 @@ def features(items, cols=3):
     return f'<div class="g{cols}">{out}</div>'
 
 
-def tiers(lang, items, subject, guide=TG):
+def tiers(lang, items, subject, guide=TG, note=None, fine=None):
     out = []
     for it in items:
         lis = ''.join(f'<li>{icon("check", 18)}<span>{x}</span></li>' for x in it['list'])
@@ -383,16 +399,17 @@ def tiers(lang, items, subject, guide=TG):
         if it.get('free'):
             b = btn(guide, T(lang, 'Open the guide', 'Открыть инструкцию'), 's', 'book', ext=True)
         else:
-            b = btn(it.get('href', TG), it.get('cta') or T(lang, 'Order in Telegram', 'Заказать в Telegram'), 'p' if it.get('badge') else 's', 'send', ext=True)
+            b = btn(it.get('href', TG), it.get('cta') or T(lang, 'Order in Telegram', 'Заказать в Telegram'), 'p' if it.get('badge') else 's',
+                    'mail' if it.get('href', '').startswith('mailto:') else 'send', ext=True)
         out.append(
             f'<div class="tier{" pop" if it.get("badge") else ""}{" free-t" if it.get("free") else ""}">{badge}{img}<h3>{it["name"]}</h3>'
             f'<p class="d">{it["desc"]}</p><div class="price">{it["price"]}</div><div class="pnote">{it.get("note", "")}</div>'
             f'<ul>{lis}</ul><div class="btns">{b}</div></div>')
     from urllib.parse import quote
     subject = quote(subject)
-    fine = T(lang, f'Prices in USD. Shipping and taxes are calculated individually. Questions: <a class="link" href="mailto:{MAIL}?subject={subject}">{MAIL}</a>',
+    fine = fine or T(lang, f'Prices in USD. Shipping and taxes are calculated individually. Questions: <a class="link" href="mailto:{MAIL}?subject={subject}">{MAIL}</a>',
              f'Цены в долларах США. Доставка и налоги считаются отдельно. Вопросы: <a class="link" href="mailto:{MAIL}?subject={subject}">{MAIL}</a>')
-    note = T(lang, '<b>The guide is free.</b> CakesCats is a non-profit project. Everything we sell can be built yourself with our open guide on GitHub. '
+    note = note or T(lang, '<b>The guide is free.</b> CakesCats is a non-profit project. Everything we sell can be built yourself with our open guide on GitHub. '
                    'Buying a ready-made device or individual support helps the project keep going.',
              '<b>Инструкция бесплатна.</b> CakesCats — некоммерческий проект. Всё, что мы продаём, можно собрать самому по открытой инструкции на GitHub. '
              'Покупая готовое устройство или индивидуальную поддержку, вы помогаете проекту работать дальше.')
@@ -446,7 +463,7 @@ def page(key, lang, paths, title, desc, nav, body, root, noindex=False):
     navh = ''.join(f'<a href="{h}">{t}</a>' for t, h in nav)
     lang_sw = (f'<span class="lang"><a href="{en_url}" data-setlang="en"{" class=on" if lang == "en" else ""}>EN</a>'
                f'<a href="{ru_url}" data-setlang="ru"{" class=on" if lang == "ru" else ""}>RU</a></span>')
-    prod_links = ''.join(f'<li><a href="{url(k)}{"ru/" if lang == "ru" else ""}">{ECO[k][0][lang]}</a></li>' for k in ['os', 'phone', 'vpn', 'llm'])
+    prod_links = ''.join(f'<li><a href="{url(k)}{"ru/" if lang == "ru" else ""}">{ECO[k][0][lang]}</a></li>' for k in ['os', 'phone', 'vpn', 'llm', 'sedutil'])
     co_links = ''.join(f'<li><a href="{url(k)}{"ru/" if lang == "ru" else ""}">{ECO[k][0][lang]}</a></li>' for k in ['home', 'main'])
     co_links += f'<li><a href="{url("main")}{"ru/" if lang == "ru" else ""}insights/">{T(lang, "Security insights", "Материалы о безопасности")}</a></li>'
     co_links += f'<li><a href="{GITHUB}/guides" target="_blank" rel="noopener">{T(lang, "Free setup guides", "Бесплатные инструкции")}</a></li>'
@@ -471,7 +488,7 @@ def page(key, lang, paths, title, desc, nav, body, root, noindex=False):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{root}assets/site.css?v=7">
+<link rel="stylesheet" href="{root}assets/site.css?v=9">
 </head>
 <body>
 <header class="hdr"><div class="wrap">
