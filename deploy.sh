@@ -12,7 +12,8 @@ DOMAINS=("$@")
 for dom in "${DOMAINS[@]}"; do
   # основной домен лежит в public_html, поддомены — в одноимённых папках
   if [ "$dom" = cakescats.com ]; then D=public_html; else D="$dom"; fi
-  tar czf - -C "out/$dom" . | ssh -i "$KEY" -o IdentitiesOnly=yes -p "$PORT" "$DEPLOY" \
+  # macOS tar: без AppleDouble-файлов ._* и расширенных атрибутов
+  COPYFILE_DISABLE=1 tar czf - --no-xattrs --no-mac-metadata -C "out/$dom" . | ssh -i "$KEY" -o IdentitiesOnly=yes -p "$PORT" "$DEPLOY" \
     "cd ~/$D && find . -mindepth 1 -maxdepth 1 ! -name '.well-known' ! -name 'cgi-bin' -exec rm -rf {} + && tar xzf - --no-same-permissions --no-overwrite-dir && find . -mindepth 1 -type d -exec chmod 755 {} + && find . -mindepth 1 -type f -exec chmod 644 {} +"
   echo "$dom: $(curl -s -o /dev/null -w '%{http_code}' "https://$dom/")"
 done
